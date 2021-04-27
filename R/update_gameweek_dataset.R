@@ -14,6 +14,8 @@ update_gameweek_dataset <- function() {
   # withr::with_dir("C:\\Users\\alittle\\Documents\\Internal\\Personal development\\Personal_R\\fpl", {
 
   # Add in git2r commmit before any of this is done.
+  git2r::add(path = "data/players_by_gameweek.rds")
+  git2r::commit(message = "Automatic update data commit.")
 
   # Get new data
   gw_data <- fplr::fpl_get_player_all() %>%
