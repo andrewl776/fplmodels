@@ -1,0 +1,129 @@
+---
+title: "Fantasy Football"
+author: "Andrew Little"
+date: "25/01/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# As a markov chain -------------------------------------------------------
+
+At each gameweek, we have 11 players that will play. Let's assume
+that these are the only players we have control of (i.e. no subs).
+
+There are N total players on the game (N~650), and given some conditions, are available to be bought.
+
+We will start assuming that we must make one transfer or less each gameweek, unlike in
+Fantasy football where you can pay 4 points to do an extra.
+
+On gameweek one, the state of our team is:
+
+* $\underline{s_1} = \{s_{1j}\}_{j=1}^{j=11}$
+
+i.e. $\underline{s_1}$ is an eleven-vector
+
+Here, we let $s_{ij}$ represent the player in the $j^{th}$ player slot on gameweek $i$.
+
+
+Let's fix $\underline{s_1}$:
+
+$$\underline{s_1} \equiv \{s_{1_{1}}, s_{1_{2}}, ..., s_{1_{{11}}}\} \in \{1, 2, ..., N\}^{11}$$
+- Note that we cannot select a single player more than once, and so we have for fixed $i$:
+
+  * $\forall (j, k) \in \{1, 2, ..., 11\}^2$, $s_{i_j} \neq{} s_{i_k}$ for $j \neq k$.
+  
+
+For gameweek 2, we can now transition to another state. Essentially, we have the following two choices:
+
+- We could swap out one $s_{1_j} \in \{1, 2, ..., N\}$ for $s_{2_j}$.
+- We could make no transfers so that $\underline{s_1} = \underline{s_2}$
+
+- We have $11(N-11)$ ~  $7029$ choices for transfer as we can swap any of the 11 players out, and for each player that we swap out, we have $N-11$ choices, as we cannnot swap for the same people.
+
+We must filter out:
+- The players that are out of pay range, given who they are substituted for.
+- Therefore we will need to apply the filter for each player, and then bind the tables together.
+
+
+## Finding the possible transfers
+
+We will first give a toy example, assuming we are in gameweek one. To do this we will use the {fplr} package.
+
+First we give ourselves a random team of 11 to begin with.
+
+```{r}
+library(dplyr)
+library(fplr)
+# Create a dataframe of players and teams simple information
+team_lookup <- fpl_get_teams() %>% select(name, id)
+
+player_lookup <- fpl_get_player_all() %>% 
+  left_join(team_lookup, c("team" = "id")) %>% 
+  select(-team) %>% 
+  rename("team_name" = name) %>% 
+  select(first_name, second_name, team_name, id)  
+```
+
+
+```{r}
+set.seed(1871)
+s_1 <- fpl_get_player_all() %>% 
+  sample_n(11, replace = FALSE) %>% 
+  left_join(team_lookup, c("team" = "id")) %>% 
+  select(-team) %>% 
+  rename("team_name" = name) %>% 
+  select(first_name, second_name, team_name, id, everything())  
+s_1
+```
+
+Okay so we now have 11 players. Therefore the following transfers are:
+
+```{r}
+library(purrr)
+
+# Find players that do not have an id in s1 and then give current id as id_out. Then bind rows.
+transfers <- s_1$id %>% 
+  map(function(id) {
+    transf <- player_lookup %>% 
+      rename("id_in" = id) %>% # here id is not the argument to map, but the column in player_lookup
+      filter(!(id_in %in% s_1$id)) %>% 
+      mutate("id_out" = id)
+  }) %>% 
+  bind_rows()
+transfers
+```
+
+
+Note how we have 642 players to begin with, and thus should expect $11*(642-11)$ total available transfer choices. This is what we have:
+
+```{r}
+nrow(transfers)
+```
+
+Now let's give a cost to each transfer. Clearly, this is 'player in cost' - 'player out cost':
+
+```{r}
+player_costs <- select(fpl_get_player_all(), id, now_cost)
+
+transfers <- transfers %>% 
+  left_join(player_costs, 
+            by = c("id_in" = "id")) %>% 
+  rename("now_cost_in" = now_cost) %>% 
+  left_join(player_costs, 
+            by = c("id_out" = "id")) %>% 
+  rename("now_cost_out" = now_cost) %>% 
+  mutate("transfer_cost" = now_cost_in - now_cost_out)
+transfers %>% 
+  select(transfer_cost, everything())
+```
+
+
+
+## Assume we already have a model for player's points
+
+We now assume that we have modelled, elsewhere, the expected number of points a player will score in a particular gameweek. Number of points in gameweek $i$ is given by:
+  *$p_{i}$
+
+
+We give this expected number of points as 
