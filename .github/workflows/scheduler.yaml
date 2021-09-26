@@ -3,7 +3,7 @@ on:
     - cron: "52 13 * * 4"
 
 jobs:
-  generate-data:
+  update-gw-data:
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
