@@ -1,0 +1,45 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(corrplot)
+library(GGally)
+library(tidyverse)
+
+gw_data <- readr::read_rds("data/players_by_gameweek.rds")
+
+gw_data %>% 
+  ggplot(aes(x = ep_next)) + 
+  geom_density()
+```
+
+Not quite log normal.
+
+```{r}
+gw_data %>% 
+  mutate(chance_of_playing_this_round = replace_na(chance_of_playing_this_round, 100)) %>% 
+  group_by(chance_of_playing_this_round) %>% 
+  summarise("mean_mins" = mean(minutes, na.rm = TRUE), "n" = n()) %>% 
+  mutate(chance_of_playing_this_round = factor(chance_of_playing_this_round)) %>% 
+  ggplot(aes(y = mean_mins, fill = chance_of_playing_this_round, 
+             x = chance_of_playing_this_round)) + 
+  geom_bar(stat = "identity") +
+  geom_label(aes(label = n))
+```
+
+
+Nothing too useful here.
+
+```{r}
+gw_data %>% 
+  ggplot(aes(x = selected_by_percent, y = next_gw_points))
+```
+
+
+
+
+
+
+

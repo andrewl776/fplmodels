@@ -8,14 +8,16 @@
 #'
 
 
-
 update_gameweek_dataset <- function() {
 
   # withr::with_dir("C:\\Users\\alittle\\Documents\\Internal\\Personal development\\Personal_R\\fpl", {
 
-  # Add in git2r commmit before any of this is done.
-  git2r::add(path = "data/players_by_gameweek.rds")
-  git2r::commit(message = "Automatic update data commit.")
+  # Commit current data if there are any changes
+  stat <- git2r::status()
+  if (length(stat$staged) != 0) {
+    git2r::add(path = "data/players_by_gameweek.rds")
+    git2r::commit(message = "Automatic update data commit.")
+  }
 
   # Get new data
   gw_data <- fplr::fpl_get_player_all() %>%
@@ -40,20 +42,19 @@ update_gameweek_dataset <- function() {
     dplyr::filter(correct_as_of_time == max(correct_as_of_time)) %>%
     dplyr::ungroup() %>%
     dplyr::select(web_name, gameweek, total_points, everything()) %>%
-    dplyr::arrange(web_name, gameweek) %>%
-    dplyr::group_by(web_name) %>%
+    dplyr::arrange(player_id, gameweek) %>%
+    dplyr::group_by(player_id) %>%
     dplyr::mutate(next_gw_points = dplyr::lead(event_points, order_by = gameweek)) %>%
     dplyr::select(web_name, gameweek, event_points, next_gw_points, dplyr::everything()) %>%
-    dplyr::ungroup() %>%
-    tidyr::drop_na(next_gw_points)
+    dplyr::ungroup()
 
   gw_data %>%
     saveRDS("data/players_by_gameweek.rds")
 
+  # gw_data %>%
+  #   readr::read_csv("data/players_by_gameweek_csv.csv")
+
   return(gw_data)
-  # })
 }
 
 
-# See https://github.com/KKulma/carbon-intensity-app/tree/main/.github/workflows
-# might help with scheduling actions on a GH repo
