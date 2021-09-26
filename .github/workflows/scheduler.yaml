@@ -2,8 +2,10 @@ on:
   schedule:
     - cron: "52 13 * * 4"
 
+name: Update Gameweek Data
+
 jobs:
-  update-gw-data:
+  generate-data:
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
