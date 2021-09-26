@@ -55,6 +55,7 @@ jobs:
         run: |
           source("R/update_gameweek_dataset.R")
         shell: Rscript {0}
+
       - name: Commit files
         run: |
           git config --local user.email "alittle@mango-solutions.com"
