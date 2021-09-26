@@ -1,8 +1,6 @@
 on:
   schedule:
-    - cron:  '30 5,17 * * *'
-
-name: Update-GW-Data
+    - cron: "0 * * * *"
 
 jobs:
   generate-data:
@@ -53,14 +51,13 @@ jobs:
 
       - name: Generate data
         run: |
-          source("R/update_gameweek_dataset.R")
+          source("R/scheduler_gw_data.R")
         shell: Rscript {0}
 
       - name: Commit files
         run: |
           git config --local user.email "alittle@mango-solutions.com"
-          git config --local user.name "GitHub Actions"
+          git config --local user.name "alittle"
           git add --all
           git commit -am "add data"
           git push
-
