@@ -51,9 +51,6 @@ update_gameweek_dataset <- function() {
   gw_data %>%
     saveRDS("data/players_by_gameweek.rds")
 
-  # gw_data %>%
-  #   readr::read_csv("data/players_by_gameweek_csv.csv")
-
   return(gw_data)
 }
 
