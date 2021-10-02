@@ -1,6 +1,10 @@
 on:
   schedule:
     - cron: "52 13 * * 4"
+  push:
+    branches:
+      master
+
 
 name: Update Gameweek Data
 
@@ -53,7 +57,7 @@ jobs:
 
       - name: Generate data
         run: |
-          source("R/scheduler_gw_data.R")
+          source("scheduler_gw_data.R")
         shell: Rscript {0}
 
       - name: Commit files

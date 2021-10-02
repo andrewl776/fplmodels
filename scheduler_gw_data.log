@@ -78,3 +78,23 @@
 [38;5;246m#   ep_next <dbl>, ep_this <dbl>, first_name <chr>, form <dbl>,[39m
 [38;5;246m#   player_id <int>, in_dreamteam <lgl>, news <chr>, news_added <chr>,[39m
 [38;5;246m#   now_cost <dbl>, photo <chr>, points_per_game <dbl>, second_name <chr>, ...[39m
+[38;5;246m# A tibble: 1,169 x 70[39m
+   web_name   gameweek event_points next_gw_points total_points chance_of_playi~
+   [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<int>[39m[23m        [3m[38;5;246m<int>[39m[23m          [3m[38;5;246m<int>[39m[23m        [3m[38;5;246m<int>[39m[23m            [3m[38;5;246m<int>[39m[23m
+[38;5;250m 1[39m Leno              1            1              0            1               [31mNA[39m
+[38;5;250m 2[39m Leno              6            0             [31mNA[39m            4               [31mNA[39m
+[38;5;250m 3[39m Rúnarsson         1            0              0            0                0
+[38;5;250m 4[39m Rúnarsson         6            0             [31mNA[39m            0                0
+[38;5;250m 5[39m Willian           1            0              0            0               50
+[38;5;250m 6[39m Willian           6            0             [31mNA[39m            0                0
+[38;5;250m 7[39m Aubameyang        1            0              7            0               50
+[38;5;250m 8[39m Aubameyang        6            7             [31mNA[39m           20              100
+[38;5;250m 9[39m Cédric            1            0              0            0               [31mNA[39m
+[38;5;250m10[39m Cédric            6            0             [31mNA[39m            1               [31mNA[39m
+[38;5;246m# ... with 1,159 more rows, and 64 more variables:[39m
+[38;5;246m#   chance_of_playing_this_round <int>, code <int>, cost_change_event <dbl>,[39m
+[38;5;246m#   cost_change_event_fall <int>, cost_change_start <dbl>,[39m
+[38;5;246m#   cost_change_start_fall <int>, dreamteam_count <int>, element_type <int>,[39m
+[38;5;246m#   ep_next <dbl>, ep_this <dbl>, first_name <chr>, form <dbl>,[39m
+[38;5;246m#   player_id <int>, in_dreamteam <lgl>, news <chr>, news_added <chr>,[39m
+[38;5;246m#   now_cost <dbl>, photo <chr>, points_per_game <dbl>, second_name <chr>, ...[39m
