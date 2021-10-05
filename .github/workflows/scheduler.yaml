@@ -58,7 +58,7 @@ jobs:
 
       - name: Generate data
         run: |
-          source("scheduler_gw_data.R")
+          update_gameweek_data()
         shell: Rscript {0}
 
       - name: Commit files
