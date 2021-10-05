@@ -16,4 +16,5 @@ Imports:
   tidymodels,
   tidyverse,
   dplyr,
-  purrr
+  purrr,
+  devtools

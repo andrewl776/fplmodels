@@ -56,11 +56,6 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
 
-      - name: Generate data
-        run: |
-          update_gameweek_dataset()
-        shell: Rscript {0}
-
       - name: Commit files
         run: |
           git config --local user.email "alittle@mango-solutions.com"
@@ -68,3 +63,8 @@ jobs:
           git add --all
           git commit -am "add data"
           git push
+
+      - name: Generate data
+        run: |
+          source("scheduler_gw_data.R")
+        shell: Rscript {0}
