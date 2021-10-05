@@ -58,7 +58,7 @@ jobs:
 
       - name: Generate data
         run: |
-          update_gameweek_data()
+          update_gameweek_dataset()
         shell: Rscript {0}
 
       - name: Commit files
