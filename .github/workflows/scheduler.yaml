@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE);
-          source("scheduler_gw_data.R")
+          update_gameweek_dataset()
         shell: Rscript {0}
 
       - name: Commit files
