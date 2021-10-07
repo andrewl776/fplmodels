@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE);
-          update_gameweek_dataset()
+          fplmodels::update_gameweek_dataset()
         shell: Rscript {0}
 
       - name: Commit files
