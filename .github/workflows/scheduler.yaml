@@ -37,7 +37,6 @@ jobs:
 
       - name: Query dependencies
         run: |
-          install.packages('devtools');
           install.packages('remotes');
           install.packages('sessioninfo');
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2);
@@ -54,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE);
-          devtools::install()
+          remotes::install_local()
         shell: Rscript {0}
 
       - name: Generate data
