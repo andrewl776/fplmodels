@@ -7,6 +7,7 @@
 #'
 #'
 
+library(dplyr)
 
 update_gameweek_dataset <- function() {
 
