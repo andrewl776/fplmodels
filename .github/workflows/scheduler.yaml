@@ -26,12 +26,18 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
+      - name: Install curl or something
+        run: |
+          sudo apt install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
+
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-r@master
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
+
+      - uses: r-lib/actions/setup-r-dependencies@v1
 
       - uses: r-lib/actions/setup-pandoc@master
 
@@ -53,7 +59,8 @@ jobs:
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE);
-          remotes::install_local()
+          remotes::install_local(force = TRUE)
+          remotes::install_github("https://github.com/ewenme/fplr")
         shell: Rscript {0}
 
       - name: Generate data

@@ -1,6 +1,11 @@
 #setwd("C:/Users/alittle/Documents/Internal/Personal_development/Personal_R/fplmodels")
-devtools::load_all()
-update_gameweek_dataset()
+tryCatch(
+  fplmodels::update_gameweek_dataset(),
+  error = function(e) {
+    message(e)
+    update_gameweek_dataset()
+  }
+)
 # library(taskscheduleR)
 # taskscheduler_create(
 #   taskname = "update_fpl_data",
