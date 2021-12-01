@@ -52,6 +52,9 @@ update_gameweek_dataset <- function() {
     dplyr::ungroup()
 
   gw_data %>%
+    readr::write_csv("data/players_by_gameweek_csv.csv")
+
+  gw_data %>%
     saveRDS("data/players_by_gameweek.rds")
 
   return(gw_data)
