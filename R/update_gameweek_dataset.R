@@ -51,6 +51,31 @@ update_gameweek_dataset <- function() {
     dplyr::select(web_name, gameweek, event_points, next_gw_points, dplyr::everything()) %>%
     dplyr::ungroup()
 
+
+  # Add in team name and position -------------------------------------------
+
+  # Get premier league table of teams
+  teams <- rvest::read_html("https://www.premierleague.com/tables") %>%
+    rvest::html_nodes("tr") %>%
+    rvest::html_nodes(".short") %>%
+    rvest::html_text() %>%
+    .[1:20] %>%
+    dplyr::tibble("team" = .) %>%
+    dplyr::mutate("position" = dplyr::row_number())
+
+  # Join with fpl API data to get IDs and full team names
+  fpl_teams <- fplr::fpl_get_teams() %>%
+    dplyr::select(-position) %>%
+    dplyr::left_join(teams, c("short_name" = "team")) %>%
+    dplyr::select(name, team_position = position, id)
+
+  gw_data <- gw_data %>%
+    dplyr::left_join(fpl_teams, c("team" = "id")) %>%
+    dplyr::mutate(team_name = name) %>%
+    dplyr::select(-name, -team)
+
+  # Write data to locations -------------------------------------------------
+
   gw_data %>%
     readr::write_csv("data/players_by_gameweek_csv.csv")
 
