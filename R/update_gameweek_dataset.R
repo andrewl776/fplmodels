@@ -70,7 +70,7 @@ update_gameweek_dataset <- function() {
     dplyr::select(name, team_position = position, id)
 
   gw_data <- gw_data %>%
-    dplyr::left_join(fpl_teams, c("team" = "id")) %>%
+    dplyr::left_join(fpl_teams, c("team" = "id", "team_position" = "team_position")) %>%
     dplyr::mutate(team_name = name) %>%
     dplyr::select(-name, -team)
 
