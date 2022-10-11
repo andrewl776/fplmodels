@@ -30,27 +30,66 @@ update_gameweek_dataset <- function() {
     ) %>%
     dplyr::rename("player_id" = id)
 
+  # Get old data
+  old_data <- readr::read_rds("data/players_by_gameweek.rds")
+
+  # Define what season it is
+  max_row <- gw_data %>%
+    dplyr::filter(correct_as_of_time == max(correct_as_of_time)) %>%
+    dplyr::slice(1)
+
+  if (max_row$gameweek == 1) {
+
+    season <- fplr::fpl_get_gameweek_current() %>%
+      dplyr::pull('deadline_time') %>%
+      lubridate::year()
+
+    if (!stringr::str_detect(season, '^20')) stop('Broken season calculation.')
+
+    season <- season %>% stringr::str_remove('^20')
+    season_next <- ((season %>% as.integer()) + 1) %>% as.character()
+
+    season <- paste0(season, '/', season_next)
+
+  } else {
+    gw_data$season <- old_data$season %>% max()
+  }
+
   # Bind with old data
   gw_data <- gw_data %>%
     dplyr::bind_rows(
-      readr::read_rds("data/players_by_gameweek.rds") %>%
-        dplyr::mutate("gameweek" = as.integer(gameweek))
+      old_data %>%
+        dplyr::mutate("gameweek" = as.integer(gameweek),
+                      "news_added" = as.character(news_added))
     )
 
   # Add in additional columns to new data with a bit of cleaning (next_gw_points)
   # We also make sure we don't double count gameweeks here
   gw_data <- gw_data %>%
     dplyr::mutate("gameweek" = as.integer(gameweek)) %>%
-    dplyr::group_by(player_id, gameweek) %>%
+    dplyr::group_by(player_id, gameweek, season) %>%
     dplyr::filter(correct_as_of_time == max(correct_as_of_time)) %>%
     dplyr::ungroup() %>%
     dplyr::select(web_name, gameweek, total_points, everything()) %>%
-    dplyr::arrange(player_id, gameweek) %>%
-    dplyr::group_by(player_id) %>%
-    dplyr::mutate(next_gw_points = dplyr::lead(event_points, order_by = gameweek)) %>%
+    dplyr::arrange(player_id, gameweek, season)
+
+  # Only give next_gw_points if the next gameweek is available
+  # (Sometimes we have the odd missing gameweek for old data)
+  gw_data <- gw_data %>%
+    dplyr::group_by(player_id, season) %>%
+    dplyr::mutate('next_gw_av' = (
+      dplyr::lead(gameweek, order_by = gameweek) == gameweek + 1
+    ))
+
+  gw_data <- gw_data %>%
+    dplyr::group_by(player_id, season) %>%
+    dplyr::mutate(next_gw_points = dplyr::if_else(
+      next_gw_av,
+      dplyr::lead(event_points, order_by = gameweek),
+      NA_real_
+    )) %>%
     dplyr::select(web_name, gameweek, event_points, next_gw_points, dplyr::everything()) %>%
     dplyr::ungroup()
-
 
   # Add in team name and position -------------------------------------------
 
