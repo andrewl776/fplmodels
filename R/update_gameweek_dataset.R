@@ -9,16 +9,17 @@
 
 library(dplyr)
 
-update_gameweek_dataset <- function() {
+update_gameweek_dataset <- function(commit = FALSE) {
 
   # withr::with_dir("C:\\Users\\alittle\\Documents\\Internal\\Personal development\\Personal_R\\fpl", {
 
   # Commit current data if there are any changes
-  if (interactive()) {
+  if (interactive() & commit) {
+    git2r::add(path = "data/players_by_gameweek.rds")
     stat <- git2r::status()
     if (length(stat$staged) != 0) {
-      git2r::add(path = "data/players_by_gameweek.rds")
-      git2r::commit(message = "Automatic update data commit.")
+      git2r::config(user.name = 'andrewl776', user.email = 'andrewlittlebristol@gmail.com')
+      git2r::commit(message = "Automatic update data commit.", )
     }
   }
 
